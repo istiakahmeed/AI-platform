@@ -36,14 +36,17 @@ const ConversationPage = () => {
       const response = await axios.post("/api/conversation", {
         messages: newMessages,
       });
+
       setMessages((current) => [...current, userMessage, response.data]);
+
+      form.reset();
     } catch (error: any) {
-      console.log(error);
+      if (error?.response?.status === 403) {
+      }
     } finally {
       router.refresh();
     }
   };
-
   return (
     <div>
       <Heading
@@ -94,7 +97,14 @@ const ConversationPage = () => {
           </form>
         </Form>
       </div>
-      <div className="space-y-4 mt-4">Messages Content</div>
+      <div className="space-y-4 mt-4">
+        {messages.length === 0 && !isLoading && <div>Empty!</div>}
+        <div className="flex flex-col-reverse gap-y-4">
+          {messages.map((message) => (
+            <div key={message.content}>{message.content}</div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -136,10 +146,11 @@ export default ConversationPage;
 
 //   const onSubmit = async (values: z.infer<typeof formSchema>) => {
 //     try {
-//       const userMessage: OpenAI.Chat.CreateChatCompletionRequestMessage = {
-//         role: "user",
-//         content: values.prompt,
-//       };
+//       const userMessage: OpenAI.ChatCompletionRequestMessageRoleEnum.CreateChatCompletionRequestMessage =
+//         {
+//           role: "user",
+//           content: values.prompt,
+//         };
 //       const newMessages = [...messages, userMessage];
 
 //       const response = await axios.post("/api/conversation", {
